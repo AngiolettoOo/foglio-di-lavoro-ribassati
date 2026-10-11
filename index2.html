@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ILCAMLAC 02 - Controllo in Produzione</title>
+  <style>
+    :root {
+      --border-color: #000;
+      --bg-header: #f2f2f2;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 5px;
+      background-color: #f8f9fa;
+      color: #000;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 8px 12px;
+      border: 2px solid var(--border-color);
+    }
+
+    /* Intestazione modulo */
+    .header-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 6px;
+    }
+
+    .header-table td, .header-table th {
+      border: 1px solid var(--border-color);
+      padding: 4px 6px;
+      font-size: 11px;
+      vertical-align: middle;
+    }
+
+    .logo-container {
+      text-align: center;
+    }
+
+    .logo-container img {
+      max-width: 100px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .header-title {
+      font-weight: bold;
+      font-size: 13px;
+      text-align: center;
+      background-color: var(--bg-header);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      align-items: center;
+    }
+
+    .info-grid div {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-grid label {
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .info-grid input {
+      width: 100%;
+      padding: 4px;
+      border: 1px solid #777;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .action-top {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .btn-action {
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .btn-pdf {
+      border: 2px solid #28a745;
+      background-color: #28a745;
+      color: #fff;
+    }
+    .btn-pdf:hover { background-color: #218838; }
+
+    .btn-reset {
+      border: 2px solid #dc3545;
+      background-color: #dc3545;
+      color: #fff;
+    }
+    .btn-reset:hover { background-color: #c82333; }
+
+    /* Selezione turno */
+    .shift-selector {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      background: #eef2f5;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+
+    .shift-btn {
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: bold;
+      border: 2px solid #0056b3;
+      background-color: #fff;
+      color: #0056b3;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .shift-btn:hover, .shift-btn.active {
+      background-color: #0056b3;
+      color: #fff;
+    }
+
+    .sub-header-banner {
+      background-color: var(--bg-header);
+      text-align: center;
+      font-weight: bold;
+      font-size: 10px;
+      padding: 4px;
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      letter-spacing: 0.5px;
+    }
+
+    /* Tabella Controlli */
+    .main-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    .main-table th, .main-table td {
+      border: 1px solid var(--border-color);
+      padding: 2px 3px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .main-table th {
+      background-color: var(--bg-header);
+      font-weight: bold;
+      font-size: 10px;
+    }
+
+    .main-table input[type="text"], .note-input {
+      width: 100%;
+      padding: 3px 2px;
+      border: 1px solid #ddd;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .col-modello input, .col-commessa input {
+      text-align: center;
+    }
+
+    .main-table input[type="checkbox"] {
+      width: 13px;
+      height: 17px;
+      cursor: pointer;
+    }
+
+    .col-ora { width: 50px; font-weight: bold; background: #fafafa; }
+    .col-modello { width: 105px; }
+    .col-commessa { width: 90px; }
+    .col-check { width: 65px; }
+
+    /* Footer firma */
+    .footer-section {
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .signature-box {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-weight: bold;
+      width: 100%;
+    }
+
+    .signature-box input {
+      flex: 1;
+      padding: 4px;
+      border: 1px solid #777;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 4mm 6mm;
+      }
+      body {
+        margin: 0;
+        background: #fff;
+      }
+      .container {
+        border: none;
+        box-shadow: none;
+        width: 100%;
+        max-width: none;
+        padding: 0;
+      }
+      .shift-selector, .action-top {
+        display: none !important;
+      }
+      .header-table td, .header-table th {
+        padding: 3px 5px;
+      }
+      .main-table th, .main-table td {
+        padding: 2px 3px;
+      }
+      .main-table input[type="text"], .note-input, .info-grid input, .signature-box input {
+        border: none;
+        background: transparent;
+        font-size: 10.5px;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+    }
+    /* Contenitore con scroll orizzontale di sicurezza per mobile */
+    .main-table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+    .main-table {
+      min-width: 550px;
+    }
+
+    /* Regole responsive per schermi piccoli */
+    @media screen and (max-width: 600px) {
+      body { padding: 2px; }
+      .container { padding: 4px 6px; }
+      .header-table td, .header-table th { font-size: 10px; padding: 3px; }
+      .info-grid { grid-template-columns: 1fr; gap: 6px; }
+      .action-top { justify-content: stretch; }
+      .action-top button { flex: 1; }
+      .shift-selector { flex-direction: column; align-items: stretch; }
+      .shift-btn { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Intestazione del Modulo con Logo -->
+  <table class="header-table">
+    <tr>
+      <td rowspan="2" style="width: 25%;" class="logo-container">
+        <img src="ILCAM.jpg" alt="ILCAM Logo">
+      </td>
+      <td class="header-title">CONTROLLO IN PRODUZIONE</td>
+      <td style="width: 25%; font-size: 10px;">
+        <strong>Modulo:</strong> ILCAMLAC 02<br>
+        <strong>Rev. 00 del 11/10/2026</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-size: 10px; font-weight: bold;">
+        REPARTO: FONDO &nbsp;&nbsp;|&nbsp;&nbsp; OPERAZIONE: LEVIGATURA RIBASSATI
+      </td>
+      <td></td>
+    </tr>
+  </table>
+
+  <!-- Area Data e Pulsanti Azione -->
+  <div class="info-grid">
+    <div>
+      <label for="dataScheda">DATA:</label>
+      <input type="date" id="dataScheda" onchange="aggiornaTitoloPDF()">
+    </div>
+    <div class="action-top">
+      <button class="btn-action btn-reset" onclick="resetModulo()">🔄 Pulisci</button>
+      <button class="btn-action btn-pdf" onclick="stampaPDF()">🖨️ Salva PDF / Stampa</button>
+    </div>
+  </div>
+
+  <!-- Selezione Turni -->
+  <div class="shift-selector">
+    <span><strong>SELEZIONA TURNO:</strong></span>
+    <button class="shift-btn active" onclick="cambiaTurno('T1', event)">T1 (06:00 - 14:00)</button>
+    <button class="shift-btn" onclick="cambiaTurno('T2', event)">T2 (14:00 - 22:00)</button>
+    <button class="shift-btn" onclick="cambiaTurno('T3', event)">T3 (22:00 - 06:00)</button>
+  </div>
+
+  <div class="sub-header-banner">
+    CONTROLLI DA ESEGUIRSI CON FREQUENZE E MODALITÀ PREVISTE DAL PIANO DI CONTROLLO
+  </div>
+
+  <!-- Tabella principale delle fasce orarie -->
+  <table class="main-table">
+    <thead>
+      <tr>
+        <th class="col-ora">ORA</th>
+        <th class="col-modello">MODELLO</th>
+        <th class="col-commessa">COMMESSA</th>
+        <th class="col-check">CONTROLLO VISIVO</th>
+        <th class="col-check">CON TINTA RETRI</th>
+        <th class="col-check">CON GRAFITE</th>
+        <th>NOTE</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <!-- Dinamico -->
+    </tbody>
+  </table>
+
+  <!-- Piè di pagina con firma -->
+  <div class="footer-section">
+    <div class="signature-box">
+      <label for="firmaOperatore">FIRMA OPERATORE:</label>
+      <input type="text" id="firmaOperatore" oninput="this.value = this.value.toUpperCase()">
+    </div>
+  </div>
+<!-- Sostituisci la tabella con questo wrapper -->
+  <div class="main-table-wrapper">
+    <table class="main-table">
+      <thead>
+      </thead>
+      <tbody id="tableBody">
+        <!-- Dinamico -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  let turnoCorrente = "T1";
+
+  document.getElementById('dataScheda').valueAsDate = new Date();
+
+  function aggiornaTitoloPDF() {
+    let dataVal = document.getElementById('dataScheda').value || 'DATA';
+    document.title = `FOGLIO DI LAVORO RIBASSATI_${dataVal}_${turnoCorrente}`;
+  }
+
+  function cambiaTurno(turno, event) {
+    turnoCorrente = turno;
+    aggiornaTitoloPDF();
+
+    document.querySelectorAll('.shift-btn').forEach(btn => btn.classList.remove('active'));
+    if (event && event.target) {
+      event.target.classList.add('active');
+    } else {
+      document.querySelectorAll('.shift-btn').forEach(btn => {
+        if (btn.innerText.startsWith(turno)) btn.classList.add('active');
+      });
+    }
+
+    generaOrari();
+  }
+
+  function generaOrari() {
+    let startHour, endHour;
+    if (turnoCorrente === 'T1') { startHour = 6; endHour = 14; }
+    else if (turnoCorrente === 'T2') { startHour = 14; endHour = 22; }
+    else if (turnoCorrente === 'T3') { startHour = 22; endHour = 30; }
+
+    const tbody = document.getElementById('tableBody');
+    
+    let nuoviOrari = [];
+    let currentMinutes = startHour * 60;
+    const endMinutes = endHour * 60;
+
+    while (currentMinutes < endMinutes) {
+      let hours = Math.floor(currentMinutes / 60) % 24;
+      let mins = currentMinutes % 60;
+
+      let oraFormattata = 
+        String(hours).padStart(2, '0') + ':' + 
+        String(mins).padStart(2, '0');
+
+      nuoviOrari.push(oraFormattata);
+      currentMinutes += 15;
+    }
+
+    let righeEsistenti = tbody.querySelectorAll('tr');
+
+    if (righeEsistenti.length === 0) {
+      nuoviOrari.forEach(ora => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="col-ora">${ora}</td>
+          <td class="col-modello"><input type="text" oninput="this.value = this.value.toUpperCase()"></td>
+          <td class="col-commessa"><input type="text" oninput="this.value = this.value.toUpperCase()"></td>
+          <td class="col-check"><input type="checkbox"></td>
+          <td class="col-check"><input type="checkbox"></td>
+          <td class="col-check"><input type="checkbox"></td>
+          <td>
+            <input type="text" class="note-input" oninput="this.value = this.value.toUpperCase(); gestisciFlussoNote(this)" onkeydown="gestisciTastiNote(this, event)">
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } else {
+      righeEsistenti.forEach((tr, index) => {
+        if (nuoviOrari[index]) {
+          tr.querySelector('.col-ora').innerText = nuoviOrari[index];
+        }
+      });
+    }
+  }
+
+  function resetModulo() {
+    if (confirm("Vuoi davvero ripulire tutti i dati inseriti nella scheda?")) {
+      document.getElementById('firmaOperatore').value = '';
+      const rows = document.querySelectorAll('#tableBody tr');
+      rows.fetch = rows.forEach(tr => {
+        tr.querySelector('.col-modello input').value = '';
+        tr.querySelector('.col-commessa input').value = '';
+        tr.querySelectorAll('.col-check input').forEach(cb => cb.checked = false);
+        tr.querySelector('.note-input').value = '';
+      });
+    }
+  }
+
+  function stampaPDF() {
+    aggiornaTitoloPDF();
+    window.print();
+  }
+
+  // Misurazione millimetrica in pixel reali: riempie la cella fino in fondo e sposta l'ultima parola intera alla riga sotto
+  function gestisciFlussoNote(el) {
+    let canvas = gestisciFlussoNote.canvas || (gestisciFlussoNote.canvas = document.createElement("canvas"));
+    let context = canvas.getContext("2d");
+    let computedStyle = window.getComputedStyle(el);
+    context.font = computedStyle.font;
+
+    let larghezzaTesto = context.measureText(el.value).width;
+    let larghezzaUtileCella = el.clientWidth - 15; // Spazio utile effettivo al netto del padding
+
+    if (larghezzaTesto >= larghezzaUtileCella) {
+      let testo = el.value;
+      let ultimoSpazio = testo.lastIndexOf(' ');
+      let testoCorrente = testo;
+      let testoAvanzato = '';
+
+      if (ultimoSpazio > 0) {
+        testoCorrente = testo.substring(0, ultimoSpazio);
+        testoAvanzato = testo.substring(ultimoSpazio + 1);
+      } else {
+        testoCorrente = testo.substring(0, testo.length - 1);
+        testoAvanzato = testo.substring(testo.length - 1);
+      }
+
+      el.value = testoCorrente;
+
+      let trProssimo = el.closest('tr').nextElementSibling;
+      if (trProssimo) {
+        let prossimaNote = trProssimo.querySelector('.note-input');
+        if (prossimaNote) {
+          prossimaNote.focus();
+          prossimaNote.value = (testoAvanzato + prossimaNote.value).toUpperCase();
+          prossimaNote.selectionStart = prossimaNote.selectionEnd = prossimaNote.value.length;
+        }
+      }
+    }
+  }
+
+  // Navigazione e cancellazione fluida con Invio e Backspace tra le righe
+  function gestisciTastiNote(el, e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      let trProssimo = el.closest('tr').nextElementSibling;
+      if (trProssimo) {
+        let prossimaNote = trProssimo.querySelector('.note-input');
+        if (prossimaNote) {
+          prossimaNote.focus();
+          prossimaNote.selectionStart = prossimaNote.selectionEnd = prossimaNote.value.length;
+        }
+      }
+    } else if (e.key === 'Backspace' && el.selectionStart === 0 && el.selectionEnd === 0) {
+      e.preventDefault();
+      let trPrecedente = el.closest('tr').previousElementSibling;
+      if (trPrecedente) {
+        let precedenteNote = trPrecedente.querySelector('.note-input');
+        if (precedenteNote) {
+          precedenteNote.focus();
+          precedenteNote.selectionStart = precedenteNote.selectionEnd = precedenteNote.value.length;
+        }
+      }
+    }
+  }
+
+  // Avvio iniziale sul turno T1
+  generaOrari();
+</script>
+
+</body>
+</html>
